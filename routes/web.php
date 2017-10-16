@@ -19,4 +19,5 @@ Route::get('login', 'SessionsController@create')->name('login');
 Route::post('login', 'SessionsController@store')->name('login');
 Route::delete('logout', 'SessionsController@destroy')->name('logout');
 
-Route::get('edit', 'EditController@edit')->name('edit');
+Route::get('edit', 'EditController@edit')->name('edit')->name("edit");
+Route::post('edit', 'EditController@edit_save')->name('edit');

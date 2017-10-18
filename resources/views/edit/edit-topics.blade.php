@@ -26,7 +26,11 @@
                         <td>{{ $topic->insert_time }}</td>
                         <td>
                             <button class="btn btn-primary topic-edit" data-toggle="modal" data-target="#myModal">edit</button>
-                            <button class="btn btn-danger">offline</button>
+                            @if ($topic->status == 0)
+                                <button class="btn btn-danger topic-line">offline</button>
+                            @else
+                                <button class="btn btn-success topic-line">online</button>
+                            @endif
                         </td>
                         <td class="topic-abstract" style="display:none">{{ $topic->abstract }}</td>
                     </tr>
@@ -86,4 +90,3 @@
         </div><!-- /.modal -->
     </div>
 </div>
-<script type="text/javascript" src="js/content.js"></script>

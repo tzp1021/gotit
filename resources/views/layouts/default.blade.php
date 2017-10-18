@@ -5,6 +5,7 @@
     <title>@yield('title', 'Whisper')</title>
     <link rel="stylesheet" href="/css/app.css">
     <script type="text/javascript" src="js/app.js"></script>
+    <script type="text/javascript" src="js/jquery.js"></script>
   </head>
   <body>
     @yield ('header')

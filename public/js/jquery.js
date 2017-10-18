@@ -7,24 +7,30 @@ $.ajaxSetup({
 $(document).ready(function(){
     initContentMain();
 
-    $("#search").click(function() {
-        console.log('search click');
-        window.open("http://www.baidu.com","","top=100,left=100,width=300,height=200");
+    $(".nav-btn").click(function() {
+        console.log('nav-btn click');        
     });
+    
 });
 
 function initContentMain() {
+    console.log("initContentMain");
     var href = location.hash;
     if(href==="") {
         href = $(".nav-btn:first").attr("href");
+        location.hash = href;
+        return;
     }
     var url = href.substr(href.indexOf('=')+1);
     getDataContentMain(url);
 }
 
+
 $(window).bind("hashchange", function(){
     var href = location.hash;
+    console.log(href);
     if(href.indexOf("url=") == -1) {
+        console.log('hashchange return')
         return;
     }
     var url = href.substr(href.indexOf('=')+1);
@@ -32,7 +38,12 @@ $(window).bind("hashchange", function(){
 });
 
 function getDataContentMain(url) {
-    $.get(url, function(data, status){
-        $(".content-main").html(data);
+    console.log("getDataContentMain:"+url);
+    $.ajax({
+        url:url,
+        type:"GET",
+        success:function(res) {
+            $(".content-main").html(res);
+        },
     });
 }

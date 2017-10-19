@@ -22,7 +22,7 @@ class SessionsController extends Controller
             'password' => $request->password,
         ];
 
-        if(Auth::attempt($credentials)) {
+        if(Auth::attempt($credentials, true)) {
             return redirect()->route('edit');
         } else {
             session()->flash('danger', 'Please check the user and password.');

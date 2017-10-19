@@ -45,5 +45,12 @@ function getDataContentMain(url) {
         success:function(res) {
             $(".content-main").html(res);
         },
+        error:function(res) {
+            console.log('error')
+            console.log(res);
+            if(res.status == 401) {
+                location.replace("/login");
+            }
+        }
     });
 }

@@ -118,6 +118,9 @@
                 console.log(res);
                 fillTable(res.data);
                 fillPage(res);
+            },
+            error:function(res) {
+                $(that).attr('href', '#'+url);
             }
         });
     }

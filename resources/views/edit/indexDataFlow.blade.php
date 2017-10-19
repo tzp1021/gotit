@@ -1,18 +1,19 @@
 <div class="tab-container">
     <div class="search-box">
-        <input type="text" id="name" placeholder="name">
+        <input type="text" placeholder="ID">
+        <input type="text" placeholder="title">
         <button class="btn btn-info" onclick="searchClick(this)">search</button>
-        <button class="btn btn-primary"  data-toggle="modal" data-target="#myModal" onclick="createClick(this)">new</button>   
+        <!--button class="btn btn-primary"  data-toggle="modal" data-target="#myModal" onclick="createClick(this)">new</button-->
     </div>
     <div class="cate-list" style="width:100%">
         <table>
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>name</th>
-                    <th>LOGO</th>
-                    <th>sort</th>                    
-                    <th>create time</th>
+                    <th>title</th>
+                    <th>picture mode</th>
+                    <th>create time</th>                    
+                    <th>topic name</th>
                     <th>operate</th>                
                 </tr>
             </thead>            
@@ -44,22 +45,43 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="col-sm-4 control-label">name</label>
+                                <label class="col-sm-4 control-label">title</label>
                                 <div class="col-sm-5">
-                                    <textarea type="text" class="form-control" name="name" style="width: 300px; height: 100px;"></textarea>
+                                    <textarea type="text" class="form-control" name="title" style="width: 300px; height: 100px;"></textarea>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="col-sm-4 control-label">abstract</label>
+                                <label class="col-sm-4 control-label">source_url</label>
                                 <div class="col-sm-5">
-                                    <textarea type="text" class="form-control" name="abstract" style="width: 300px; height: 100px;"></textarea>
+                                    <textarea type="text" class="form-control" name="source_url" style="width: 300px; height: 100px;"></textarea>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="col-sm-4 control-label">icon</label>
+                                <label class="col-sm-4 control-label">video_source</label>
                                 <div class="col-sm-5">
-                                    <input type="text" class="form-control" name="icon_url" style="width: 300px; margin-bottom: 3px"/>
-                                    <input type="file" class="form-control upfile" name="picture"  accept="image/png,image/jpg,image/jpeg"/>
+                                    <textarea type="text" class="form-control" name="video_source" style="width: 300px; height: 100px;"></textarea>
+                                    <br>
+                                    <span>if has video_source, then image must be set.</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">image</label>
+                                <div class="col-sm-6">
+                                    <textarea type="text" class="form-control" name="image" style="width: 300px; height: 100px;" disabled></textarea>
+                                </div>
+                                <!--div class="col-sm-2">
+                                    <button  class="btn btn-success upfile">upload</button>
+                                </div-->
+                            </div>
+							<div class="form-group">
+                                <label class="col-sm-4 control-label"></label>
+                                <div class="col-sm-5">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">topic name</label>
+                                <div class="col-sm-5">
+                                    <input type="text" class="form-control" name="topic" style="width: 300px; margin-bottom: 3px"/>
                                 </div>
                             </div>
                         </form>
@@ -74,8 +96,10 @@
 	</div><!-- modal fade -->
 </div>
 <script>
-    var pageUrl = '/edit?action=queryTopicList&page=';
+    var pageUrl = '/edit?action=queryDataFlow&page=';
+    var imageUrl = 'http://feedssource.moment.yirgalab.com';
     var searchKey = '';
+    var tableData;
     $(function(){
         initPage('');
     });
@@ -151,21 +175,40 @@
     function fillTable(data) {
         console.log("fillTable");
         console.log(data);
+        tableData = data;
         var tableStr = "";
         var len = data.length;
         for(var i = 0; i < len; i++){
+            var imageStr = '<span style="font-size: 20px; color: red">Pure text</span>';
+            if(data[i].video_cover != null && data[i].video_cover != '') {
+                var covers = JSON.parse(data[i].video_cover);
+                var coverUrl = covers[0].path;
+                var url = imageUrl + coverUrl.substr(coverUrl.indexOf('feeds') + 5);
+                imageStr = '<img style="width: 100px; height:100px;" src="' + url
+                        + '"/><span style="font-size: 20px; color: red">video</span>';
+            } else if(data[i].image != null && data[i].image != '') {
+                var desc = 'single picture';
+                var images = JSON.parse(data[i].image);
+                var image_url = images[0].path;
+                if(images.length > 1) {
+                    desc = 'multi pictures';
+                }
+                var url = imageUrl + image_url.substr(imageUrl.indexOf('feeds') + 5);
+                imageStr = '<img style="width: 100px; height:100px;" src="' + url
+                        + '"/><span style="font-size: 20px; color: red"> ' + desc + '</span>';
+            }
             tableStr += "<tr><td>" + data[i].id + "</td>"
-                    + "<td>" + data[i].name + "</td>"
-                    + "<td><img style='width:40px;height:40px' src='" + data[i].icon_url + "'/></td>"
-                    + "<td>" + data[i].sort + "</td>"
-                    + "<td>" + data[i].insert_time + "</td>"
+                    + "<td>" + data[i].title + "</td>"
+                    + '<td>' + imageStr + '</td>'
+                    + "<td>" + data[i].date + "</td>"
+                    + "<td>" + data[i].topic_id + "</td>"
                     + "<td><button class='btn btn-primary' data-toggle='modal' data-target='#myModal' onclick='editClick(this)'>edit</button>";
             if(data[i].status == 0) {
                 tableStr += '<button class="btn btn-danger" onclick="offlineTopic(this)">offline</button>';
             } else {
                 tableStr += '<button class="btn btn-success" onclick="onlineTopic(this)">online</button>';
             }
-            tableStr += '</td><td class="topic-abstract" style="display:none">' + data[i].abstract + '</td></tr>';
+            tableStr += '</td></tr>';
         }
         $('#dataTable').html(tableStr);
     }
@@ -183,14 +226,14 @@
     }
 
     function updateTopicStatus(that, status) {
-        console.log('updateTopicStatus');
+        console.log('updateFeedStatus');
         console.log(status);
         var tr = $(that).parents("tr");
         var id = tr.children("td:eq(0)").text();
         var curBtn = $(that);
         console.log(id);
 		$.ajax({
-        url:"/edit?action=updateTopicStatus",
+        url:"/edit?action=updateFeedStatus",
             type:"POST",
             dataType:'json',
             data:{'id':id, 'status':status},
@@ -209,17 +252,34 @@
     }
 
     var curTr;
-    function editClick(that){
+    function editClick(that) {
 		console.log("topic-edit");
 		$("#add-cate-frm")[0].reset();
 		curTr = $(that).parents("tr");
         console.log(curTr);
 		console.log(curTr.children("td:eq(0)").text());
-		$("#add-cate-frm input[name='id']").val(curTr.children("td:eq(0)").text());
-		$("#add-cate-frm textarea[name='name']").val(curTr.children("td:eq(1)").text());
-		$("#add-cate-frm textarea[name='abstract']").val(curTr.children("td:eq(6)").text());    
-		$("#add-cate-frm input[name='icon_url']").val(curTr.children("td:eq(2)").children("img").attr("src"));
+        var rowData = findRowDataById(curTr.children("td:eq(0)").text());
+        console.log(rowData);
+        var imageInfo = rowData.image;
+        if(rowData.video_cover != null && rowData.video_cover != '') {
+            imageInfo = rowData.video_cover;
+        }
+		$("#add-cate-frm input[name='id']").val(rowData.id);
+		$("#add-cate-frm textarea[name='title']").val(rowData.title);
+		$("#add-cate-frm textarea[name='source_url']").val(rowData.source_url);    
+		$("#add-cate-frm textarea[name='video_source']").val(rowData.video_source);
+		$("#add-cate-frm textarea[name='image']").val(imageInfo);
+//		$("#add-cate-frm textarea[name='source_url']").val(curTr.children("td:eq(6)").text());
+		$("#add-cate-frm input[name='topic']").val(rowData.topic_id);
 	}
+
+    function findRowDataById(id) {
+        for(var i = 0; i < tableData.length; i++) {
+            if(tableData[i].id == id) {
+                return tableData[i];
+            }
+        }
+    }
 
     function createClick(that) {
         console.log("create click");
@@ -230,7 +290,7 @@
         console.log("submit click");
 		var formData = new FormData($( "#add-cate-frm" )[0]);
 		$.ajax({
-			url:"/edit?action=updateTopic",
+			url:"/edit?action=updateFeed",
 			type:"POST",
 			data:formData,
 			contentType:false,
@@ -239,9 +299,9 @@
 				console.log(res);
 				var result = JSON.parse(res);
 				if(result.errCode == 0) {
-					curTr.children("td:eq(1)").text(result.data.topic.name);
-					curTr.children("td:eq(6)").text(result.data.topic.abstract);
-					curTr.children("td:eq(2)").children("img").attr("src", result.data.topic.icon_url);
+					curTr.children("td:eq(1)").text(result.data.feed.title);
+					curTr.children("td:eq(4)").text(result.data.feed.topic_id);
+//					curTr.children("td:eq(4)").children("img").attr("src", result.data.topic.icon_url);
 				}
 				$("#myModal").modal('hide');
 				alert("edit succeed");

@@ -28,7 +28,7 @@ class EditController extends Controller
             case 'indexDataFlow':
                 return view('edit.indexDataFlow');
             case 'queryDataFlow':
-                return Feeds('');
+                return getFeeds('');
             default:
                 echo 'page is not found';
         }
@@ -40,6 +40,10 @@ class EditController extends Controller
                 return updateTopic($request);
             case 'updateTopicStatus':
                 return updateTopicStatus($request);
+            case 'updateFeed':
+                return updateFeed($request);
+            case 'updateFeedStatus':
+                return updateFeedStatus($request);
             default:
                 return paramIllegal();
         }
@@ -51,12 +55,14 @@ function getTopics($sub_str) {
     Log::info('getTopics');
     Log::info($sub_str);
     $res = NewsTopic::where('name', 'LIKE', '%'.$sub_str.'%')->paginate(10);
-//    Log::info($res);
     return $res;
 }
 
 function getFeeds($sub_str) {
-    return NewsDataFlow::paginate(10);
+    Log::info('getFeeds');
+    $res = NewsDataFlow::paginate(10);
+    Log::info($res);
+    return $res;
 }
 
 function updateTopic($request) {
@@ -105,6 +111,18 @@ function updateTopic($request) {
     return returnSucceed($data);
 }
 
+function updateFeed($request) {
+    Log::info('updateFeed');
+    $res = NewsDataFlow::find($request->id)->update(['title' => $request->title, 'source_url' => $request->source_url, 'video_source' => $request->video_source]);
+    if($res) {
+        $feed = NewsDataFlow::find($request->id);
+    }
+	$data = array(
+        'feed' => $feed,
+    );
+    return returnSucceed($data);
+}
+
 function updateTopicStatus($request) {
     Log::info("updateTopicStatus");
     Log::info($request->id);
@@ -116,6 +134,19 @@ function updateTopicStatus($request) {
     }
     return returnError(2, 'update error');
 }
+
+function updateFeedStatus($request) {
+   Log::info("updateFeedStatus");
+    Log::info($request->id);
+    Log::info($request->status);
+    $res = NewsDataFlow::find($request->id)->update(['status' => $request->status]);
+    if($res) {
+        $data = array('status' => $request->status);
+        return returnSucceed($data);
+    }   
+    return returnError(2, 'update error'); 
+}
+
 function returnSucceed($data) {
     $result = array(
         'errCode' => 0,

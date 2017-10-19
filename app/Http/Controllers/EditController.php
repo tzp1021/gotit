@@ -24,7 +24,7 @@ class EditController extends Controller
             case 'indexTopicList':
                 return view('edit.indexTopicList');
             case 'queryTopicList':
-                return getTopics('');
+                return getTopics($request->input('key', ''));
             case 'indexDataFlow':
                 return view('edit.indexDataFlow');
             case 'queryDataFlow':
@@ -49,8 +49,9 @@ class EditController extends Controller
 
 function getTopics($sub_str) {
     Log::info('getTopics');
-    $res = NewsTopic::paginate(10);
-    Log::info($res);
+    Log::info($sub_str);
+    $res = NewsTopic::where('name', 'LIKE', '%'.$sub_str.'%')->paginate(10);
+//    Log::info($res);
     return $res;
 }
 

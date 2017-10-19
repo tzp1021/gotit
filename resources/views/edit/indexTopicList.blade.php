@@ -1,7 +1,7 @@
 <div class="tab-container">
     <div class="search-box">
         <input type="text" id="name" placeholder="name">
-        <button class="btn btn-info" id="topic-search">search</button>
+        <button class="btn btn-info" onclick="searchClick(this)">search</button>
         <button class="btn btn-primary"  data-toggle="modal" data-target="#myModal" onclick="createClick(this)">new</button>   
     </div>
     <div class="cate-list" style="width:100%">
@@ -75,8 +75,9 @@
 </div>
 <script>
     var pageUrl = '/edit?action=queryTopicList&page=';
+    var searchKey = '';
     $(function(){
-        $.ajax({
+/*        $.ajax({
             url:pageUrl + '1',
             type:"GET",
             success:function(res) {
@@ -84,8 +85,36 @@
                 fillTable(res.data);
                 fillPage(res);
             },
-        });
+        });*/
+        initPage('');
     });
+
+    function initPage() {
+        var url = pageUrl + '1';
+        if(searchKey != '') {
+            url += '&key=' + searchKey;
+        }
+        $.ajax({
+            url:url,
+            type:"GET",
+            success:function(res) {
+                console.log(res);
+                fillTable(res.data);
+                fillPage(res);
+            },
+        });
+    }
+
+    function searchClick(that) {
+        console.log('search');
+        $input = $(that).prev();
+        var val = $input.val();
+        if(val == '') {
+            console.log('no input search return');
+        }
+        searchKey = val;
+        initPage();
+    }
 
     function fillPage(paginator) {
         console.log('fillPage');
@@ -109,6 +138,9 @@
         console.log('page click');
         console.log(location.hash);
         var url = $(that).attr('href').substr(1);
+        if(searchKey != '') {
+            url += '&key=' + searchKey;
+        }
         console.log(url);
         $(that).attr('href', location.hash);
         $.ajax({
